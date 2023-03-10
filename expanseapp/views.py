@@ -2,7 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib import *
 from .models import *
 from .forms import *
-# Create your views here.
+from django.contrib.auth import *
+from django.contrib.auth.decorators import *
+
+@login_required
 def expense(request):
     all_expense = Expense.objects.all()
     print(all_expense)
@@ -33,3 +36,22 @@ def edit_views(request,id):
     form = ExpenseForm(instance = obj)
     context = {"form": form }
     return render(request, "edit.html", context)
+
+def user_login(request):
+    if request.method == "POST":
+        username = request.POST["uname"]
+        # print(username)
+        password = request.POST["psw"]
+        # print(password)
+        user = authenticate(request, username = username, password = password)
+        print(user)
+        if user:
+            user = login(request,user)
+            return redirect("expense")
+
+    return render(request, "login.html")
+
+
+def log_out(request):
+    logout(request)
+    return redirect("login")
